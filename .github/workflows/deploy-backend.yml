@@ -1,0 +1,49 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build backend
+        run: |
+          cd packages/backend
+          npm ci
+          npm run build
+
+      - name: Deploy to server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "packages/backend/dist/*,packages/backend/package.json,packages/backend/package-lock.json"
+          target: "/mnt/storage/cloudmining/backend"
+          strip_components: 2
+          overwrite: true
+
+      - name: Install dependencies and restart
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /mnt/storage/cloudmining/backend
+            npm ci --production
+            # Use unique process name and port 4100
+            pm2 restart xphere-cloudmining || pm2 start ecosystem.config.js
+            pm2 save
