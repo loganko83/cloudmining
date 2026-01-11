@@ -16,8 +16,13 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { User } from '../users/entities/user.entity';
 
 interface RequestWithUser extends ExpressRequest {
+  user: User;
+}
+
+interface RequestWithJwtUser extends ExpressRequest {
   user: { id: string; email: string };
 }
 
@@ -81,7 +86,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout and invalidate refresh tokens' })
   @ApiResponse({ status: 200, description: 'Logged out successfully' })
-  async logout(@Request() req: RequestWithUser) {
+  async logout(@Request() req: RequestWithJwtUser) {
     await this.authService.logout(req.user.id);
     return {
       success: true,
