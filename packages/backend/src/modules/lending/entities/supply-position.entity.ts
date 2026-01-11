@@ -38,7 +38,7 @@ export class SupplyPosition {
   @Column({ name: 'xpx_balance', type: 'decimal', precision: 36, scale: 18 })
   xpxBalance: string;
 
-  @Column({ name: 'entry_index', type: 'decimal', precision: 36, scale: 27 })
+  @Column({ name: 'entry_index', type: 'decimal', precision: 36, scale: 18 })
   entryIndex: string;
 
   @CreateDateColumn({ name: 'created_at' })

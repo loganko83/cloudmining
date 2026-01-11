@@ -19,10 +19,10 @@ export class LendingPool {
   @Column({ name: 'total_borrowed', type: 'decimal', precision: 36, scale: 18, default: '0' })
   totalBorrowed: string;
 
-  @Column({ name: 'liquidity_index', type: 'decimal', precision: 36, scale: 27, default: '1000000000000000000000000000' })
+  @Column({ name: 'liquidity_index', type: 'decimal', precision: 36, scale: 18, default: '1.0' })
   liquidityIndex: string;
 
-  @Column({ name: 'borrow_index', type: 'decimal', precision: 36, scale: 27, default: '1000000000000000000000000000' })
+  @Column({ name: 'borrow_index', type: 'decimal', precision: 36, scale: 18, default: '1.0' })
   borrowIndex: string;
 
   @Column({ name: 'supply_apy', type: 'decimal', precision: 10, scale: 4, default: '0' })

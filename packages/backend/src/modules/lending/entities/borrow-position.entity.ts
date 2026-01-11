@@ -40,7 +40,7 @@ export class BorrowPosition {
   @Column({ name: 'collateral_asset', length: 10 })
   collateralAsset: string;
 
-  @Column({ name: 'entry_index', type: 'decimal', precision: 36, scale: 27 })
+  @Column({ name: 'entry_index', type: 'decimal', precision: 36, scale: 18 })
   entryIndex: string;
 
   @Column({ name: 'health_factor', type: 'decimal', precision: 10, scale: 4, nullable: true })
