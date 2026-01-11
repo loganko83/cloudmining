@@ -6,8 +6,13 @@ import {
   Request,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Request as ExpressRequest } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Web3Service } from './web3.service';
+
+interface RequestWithUser extends ExpressRequest {
+  user: { id: string; walletAddress?: string };
+}
 
 @ApiTags('web3')
 @Controller('web3')
@@ -51,7 +56,7 @@ export class Web3Controller {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get XP token balance for authenticated user' })
-  async getXPBalance(@Request() req) {
+  async getXPBalance(@Request() req: RequestWithUser) {
     const walletAddress = req.user.walletAddress;
     if (!walletAddress) {
       return {

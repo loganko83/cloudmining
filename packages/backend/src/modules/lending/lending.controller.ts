@@ -7,9 +7,14 @@ import {
   Request,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Request as ExpressRequest } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { LendingService } from './lending.service';
 import { SupplyDto, WithdrawDto, BorrowDto, RepayDto } from './dto/lending.dto';
+
+interface RequestWithUser extends ExpressRequest {
+  user: { id: string };
+}
 
 @ApiTags('lending')
 @Controller('lending')
@@ -31,7 +36,7 @@ export class LendingController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user lending positions' })
-  async getMyPositions(@Request() req) {
+  async getMyPositions(@Request() req: RequestWithUser) {
     const positions = await this.lendingService.getUserPositions(req.user.id);
     return {
       success: true,
@@ -44,7 +49,7 @@ export class LendingController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Supply XP to lending pool' })
   @ApiResponse({ status: 201, description: 'XP supplied, XPx tokens received' })
-  async supply(@Request() req, @Body() dto: SupplyDto) {
+  async supply(@Request() req: RequestWithUser, @Body() dto: SupplyDto) {
     const position = await this.lendingService.supply(
       req.user.id,
       dto.amount,
@@ -60,7 +65,7 @@ export class LendingController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Withdraw XP from lending pool' })
-  async withdraw(@Request() req, @Body() dto: WithdrawDto) {
+  async withdraw(@Request() req: RequestWithUser, @Body() dto: WithdrawDto) {
     const position = await this.lendingService.withdraw(req.user.id, dto.amount);
     return {
       success: true,
@@ -72,7 +77,7 @@ export class LendingController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Borrow XP with collateral' })
-  async borrow(@Request() req, @Body() dto: BorrowDto) {
+  async borrow(@Request() req: RequestWithUser, @Body() dto: BorrowDto) {
     const position = await this.lendingService.borrow(
       req.user.id,
       dto.borrowAmount,
@@ -89,7 +94,7 @@ export class LendingController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Repay borrowed XP' })
-  async repay(@Request() req, @Body() dto: RepayDto) {
+  async repay(@Request() req: RequestWithUser, @Body() dto: RepayDto) {
     const position = await this.lendingService.repay(
       req.user.id,
       dto.positionId,

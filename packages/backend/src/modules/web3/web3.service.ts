@@ -38,9 +38,9 @@ export class Web3Service implements OnModuleInit {
       return {
         verified: receipt.status === 1,
         from: tx.from,
-        to: tx.to,
+        to: tx.to ?? undefined,
         value: ethers.formatEther(tx.value),
-        status: receipt.status,
+        status: receipt.status ?? undefined,
       };
     } catch (error) {
       console.error('Transaction verification failed:', error);

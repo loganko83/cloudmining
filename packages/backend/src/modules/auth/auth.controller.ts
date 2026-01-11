@@ -9,12 +9,17 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { Request as ExpressRequest } from 'express';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+
+interface RequestWithUser extends ExpressRequest {
+  user: { id: string; email: string };
+}
 
 @ApiTags('auth')
 @Controller('auth')
@@ -46,7 +51,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(@Request() req, @Body() loginDto: LoginDto) {
+  async login(@Request() req: RequestWithUser, @Body() loginDto: LoginDto) {
     const result = await this.authService.login(req.user);
     return {
       success: true,
@@ -76,7 +81,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout and invalidate refresh tokens' })
   @ApiResponse({ status: 200, description: 'Logged out successfully' })
-  async logout(@Request() req) {
+  async logout(@Request() req: RequestWithUser) {
     await this.authService.logout(req.user.id);
     return {
       success: true,
